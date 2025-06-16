@@ -1,0 +1,52 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.navbar-logo-img {
+  height: 30px;
+}
+
+.navbar-logo-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #03165e;
+  font-family: "Arial", sans-serif;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-email {
+  color: #0072bc;
+  font-size: 14px;
+}
+
+.signout-btn {
+  background-color: #0072bc;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
