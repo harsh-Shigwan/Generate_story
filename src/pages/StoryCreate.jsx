@@ -10,7 +10,7 @@ const VALIDATION_RULES = {
     minLength: 1,
     maxLength: 50,
     errorMessages: {
-      required: "Story ID is required",
+      required: "Story ID or title is required",
       startEnd: "Cannot start or end with - or _",
       consecutive: "Cannot have consecutive - or _ characters",
       length: "Must be less than 50 characters",
@@ -18,7 +18,7 @@ const VALIDATION_RULES = {
   },
   storyContent: {
     minLength: 10,
-    maxLength: 500,
+    maxLength: 5000,
     errorMessages: {
       required: "Story content is required",
       length: "Must be greater than 10 characters",
