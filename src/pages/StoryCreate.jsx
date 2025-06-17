@@ -4,13 +4,14 @@ import Navbar from "../components/Navbar";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./StoryCreate.css";
 
 const VALIDATION_RULES = {
   storyId: {
     minLength: 1,
     maxLength: 50,
     errorMessages: {
-      required: "Story ID or title is required",
+      required: "Story ID or Story title is required",
       startEnd: "Cannot start or end with - or _",
       consecutive: "Cannot have consecutive - or _ characters",
       length: "Must be less than 50 characters",
@@ -30,9 +31,9 @@ const VALIDATION_RULES = {
 
 const debounce = (func, delay) => {
   let timer;
-  return function (...args) {
+  return (...args) => {
     clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
+    timer = setTimeout(() => func(...args), delay);
   };
 };
 
@@ -40,23 +41,14 @@ const validateHindiText = (text, storyId) => {
   const hindiRegex = /^[\u0900-\u097F\s।,!?'"():\-]+$/;
   const lines = text.trim().split(/\n+/);
   const results = [];
-
   let totalWords = 0;
 
   for (let i = 0; i < lines.length; i++) {
     const para = lines[i].trim();
     if (!para) continue;
-
-    if (!hindiRegex.test(para)) {
-      return `Paragraph ${i + 1} contains non-Hindi characters.`;
-    }
-
+    if (!hindiRegex.test(para)) return `Paragraph ${i + 1} contains non-Hindi characters.`;
     const wordCount = para.split(/\s+/).filter(Boolean).length;
-
-    if (wordCount > 70) {
-      return `Paragraph ${i + 1} has ${wordCount} words. Max allowed is 70.`;
-    }
-
+    if (wordCount > 70) return `Paragraph ${i + 1} has ${wordCount} words. Max allowed is 70.`;
     results.push(`Para ${i + 1} - ${wordCount} words`);
     totalWords += wordCount;
   }
@@ -64,7 +56,7 @@ const validateHindiText = (text, storyId) => {
   if (results.length === 0) return "No valid Hindi paragraph found.";
 
   return {
-    message: `The story "${storyId}" has ${results.length} paragraphs. The total number of words in the story are ${totalWords}.\n${results.join("\n")}\nStory Upload Successful.`,
+    message: `The story "${storyId}" has ${results.length} paragraphs. Total words: ${totalWords}.\n${results.join("\n")}\nStory Upload Successful.`,
   };
 };
 
@@ -76,21 +68,19 @@ const StoryCreate = ({ signOut, user }) => {
 
   const validateField = useCallback((name, value) => {
     const rules = VALIDATION_RULES[name];
-    const trimmedValue = value.trim();
+    const trimmed = value.trim();
 
-    if (!trimmedValue) return rules.errorMessages.required;
+    if (!trimmed) return rules.errorMessages.required;
 
     if (name === "storyId") {
-      if (trimmedValue.length > rules.maxLength) return rules.errorMessages.length;
-      if (/^[-_]|[-_]$/.test(trimmedValue)) return rules.errorMessages.startEnd;
-      if (/_{2,}|-{2,}/.test(trimmedValue)) return rules.errorMessages.consecutive;
+      if (trimmed.length > rules.maxLength) return rules.errorMessages.length;
+      if (/^[-_]|[-_]$/.test(trimmed)) return rules.errorMessages.startEnd;
+      if (/_{2,}|-{2,}/.test(trimmed)) return rules.errorMessages.consecutive;
     } else {
-      if (
-        trimmedValue.length < rules.minLength ||
-        trimmedValue.length > rules.maxLength
-      ) return rules.errorMessages.length;
+      if (trimmed.length < rules.minLength || trimmed.length > rules.maxLength)
+        return rules.errorMessages.length;
       if (/^\s+$/.test(value)) return rules.errorMessages.spaces;
-      if (/[<>]/.test(trimmedValue)) return rules.errorMessages.invalidChars;
+      if (/[<>]/.test(trimmed)) return rules.errorMessages.invalidChars;
     }
     return "";
   }, []);
@@ -106,16 +96,13 @@ const StoryCreate = ({ signOut, user }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (isTouched[name]) {
-      debouncedValidate(name, value);
-    }
+    if (isTouched[name]) debouncedValidate(name, value);
   };
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setIsTouched((prev) => ({ ...prev, [name]: true }));
-    const error = validateField(name, value);
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const validateForm = useCallback(() => {
@@ -140,18 +127,14 @@ const StoryCreate = ({ signOut, user }) => {
     return isValid;
   }, [formData, validateField]);
 
-  const isFormValid = useCallback(() => {
-    return (
-      formData.storyId.trim().length >= VALIDATION_RULES.storyId.minLength &&
-      formData.storyContent.trim().length >= VALIDATION_RULES.storyContent.minLength &&
-      !Object.values(errors).some(Boolean)
-    );
-  }, [formData, errors]);
+  const isFormValid = () =>
+    formData.storyId.trim().length >= VALIDATION_RULES.storyId.minLength &&
+    formData.storyContent.trim().length >= VALIDATION_RULES.storyContent.minLength &&
+    !Object.values(errors).some(Boolean);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsTouched({ storyId: true, storyContent: true });
-
     if (!validateForm() || isSubmitting) return;
 
     setIsSubmitting(true);
@@ -165,92 +148,59 @@ const StoryCreate = ({ signOut, user }) => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      const hindiResult = validateHindiText(formData.storyContent, formData.storyId);
-      if (typeof hindiResult === "object") {
-        toast.success(hindiResult.message, { autoClose: 10000 });
-      } else {
-        toast.success("Story created successfully!");
-      }
+      const result = validateHindiText(formData.storyContent, formData.storyId);
+      if (typeof result === "object") toast.success(result.message, { autoClose: 10000 });
+      else toast.success("Story created successfully!");
 
       setFormData({ storyId: "", storyContent: "" });
       setErrors({});
       setIsTouched({ storyId: false, storyContent: false });
     } catch (err) {
-      const errorMessage =
+      const msg =
         err.response?.data?.message || err.response?.status === 409
           ? "Story ID already exists"
           : err.request
           ? "Network error"
           : "Failed to create story";
-      toast.error(errorMessage);
-      console.log("Error creating story:", err.response?.data);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputStyles = (name) => ({
-    width: "100%",
-    padding: "10px",
-    borderRadius: "5px",
-    border: errors[name] ? "1px solid #ff4444" : "1px solid #ccc",
-    marginBottom: "5px",
-    resize: "vertical",
-    height: name === "storyContent" ? "200px" : "auto",
-  });
-
   return (
     <div>
       <Navbar signOut={signOut} user={user} />
-      <div style={{ display: "flex" }}>
+      <div className="container">
         <Sidebar />
-        <div style={{ flex: 1, backgroundColor: "#f5f7fa", minHeight: "90vh" }}>
+        <div className="content">
           <ToastContainer position="top-center" autoClose={5000} />
-          <h1 style={{ textAlign: "center", margin: "20px 0" }}>Create Story</h1>
-
-          <form onSubmit={handleSubmit} style={{ maxWidth: "800px", margin: "0 auto", padding: "0 20px" }}>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>Story ID:</label>
-              <input
-                name="storyId"
-                value={formData.storyId}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Enter unique story ID or story title"
-                style={inputStyles("storyId")}
-                maxLength={VALIDATION_RULES.storyId.maxLength}
-              />
-              <CharCounter current={formData.storyId.length} max={VALIDATION_RULES.storyId.maxLength} error={errors.storyId} />
-            </div>
-
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ fontWeight: "bold", display: "block", marginBottom: "5px" }}>Story Content:</label>
-              <textarea
-                name="storyContent"
-                value={formData.storyContent}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Enter your story content"
-                style={inputStyles("storyContent")}
-                maxLength={VALIDATION_RULES.storyContent.maxLength}
-              />
-              <CharCounter current={formData.storyContent.length} max={VALIDATION_RULES.storyContent.maxLength} error={errors.storyContent} />
-            </div>
-
+          <h1 className="heading">Create Story</h1>
+          <form onSubmit={handleSubmit} className="form-wrapper">
+            <InputField
+              label="Story ID / Title:"
+              name="storyId"
+              type="text"
+              value={formData.storyId}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.storyId}
+              max={VALIDATION_RULES.storyId.maxLength}
+            />
+            <InputField
+              label="Story Content:"
+              name="storyContent"
+              type="textarea"
+              value={formData.storyContent}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.storyContent}
+              max={VALIDATION_RULES.storyContent.maxLength}
+            />
             <button
               type="submit"
               disabled={!isFormValid() || isSubmitting}
-              style={{
-                padding: "12px 24px",
-                backgroundColor: isFormValid() ? "#0072bc" : "#cccccc",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: isFormValid() ? "pointer" : "not-allowed",
-                fontSize: "1rem",
-                fontWeight: "500",
-                transition: "background-color 0.3s",
-              }}
+              className="submit-btn"
             >
               {isSubmitting ? "Creating..." : "Create Story"}
             </button>
@@ -261,10 +211,36 @@ const StoryCreate = ({ signOut, user }) => {
   );
 };
 
-const CharCounter = ({ current, max, error }) => (
-  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px" }}>
-    <div style={{ color: "#ff4444", fontSize: "0.85rem" }}>{error}</div>
-    <div style={{ fontSize: "0.85rem", color: current > max ? "#ff4444" : "#666" }}>{current}/{max}</div>
+const InputField = ({ label, name, value, onChange, onBlur, error, max, type }) => (
+  <div className="input-group">
+    <label className="label">{label}</label>
+    {type === "textarea" ? (
+      <textarea
+        className={`textarea ${error ? "error-border" : ""}`}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={`Enter ${label.toLowerCase()}`}
+        maxLength={max}
+      />
+    ) : (
+      <input
+        className={`input ${error ? "error-border" : ""}`}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={`Enter ${label.toLowerCase()}`}
+        maxLength={max}
+      />
+    )}
+    <div className="footer">
+      <div className="error">{error}</div>
+      <div className={`counter ${value.length > max ? "exceed" : ""}`}>
+        {value.length}/{max}
+      </div>
+    </div>
   </div>
 );
 
