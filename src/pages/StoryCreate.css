@@ -1,17 +1,15 @@
-.container {
+/* Form Container Styles */
+.form-container {
   display: flex;
-}
-
-.content {
-  flex: 1;
-  background-color: #f5f7fa;
-  min-height: 90vh;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .form-wrapper {
+  flex: 2;
   max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px;
 }
 
 .heading {
@@ -19,6 +17,7 @@
   margin: 20px 0;
 }
 
+/* Input Field Styles */
 .input-group {
   margin-bottom: 20px;
 }
@@ -77,4 +76,63 @@
 .submit-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.error-border {
+  border-color: #ff4444;
+}
+
+/* Stats Panel Styles */
+.stats-panel {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  max-width: 350px;
+}
+
+.stats-panel h3 {
+  margin-top: 0;
+  color: #0072bc;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.stats-panel p {
+  margin: 8px 0;
+}
+
+.word-counts {
+  margin-top: 10px;
+}
+
+.word-counts ul {
+  padding-left: 20px;
+  margin: 5px 0;
+  list-style-type: none;
+}
+
+.word-counts li {
+  padding: 3px 0;
+  font-size: 0.9rem;
+}
+
+.valid {
+  color: #4CAF50;
+  font-weight: bold;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.invalid {
+  color: #F44336;
+  font-weight: bold;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
 }

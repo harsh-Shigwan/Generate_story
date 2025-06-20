@@ -50,3 +50,18 @@
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+/* Add to existing Navbar.css */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  color: #333;
+  margin-right: 15px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}

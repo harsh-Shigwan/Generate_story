@@ -1,25 +1,20 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
+// pages/Admin.jsx
+import React, { useState } from 'react';
+import Layout from '../components/Layout';
 
-const Admin = ({ signOut, user}) => {
+const Admin = ({ signOut, user }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <>
-    <Navbar signOut={signOut} user={user} />
-    <Sidebar/>
-    <div
-          style={{
-            flex: 1,
-            marginLeft: "220px",
-            padding: "30px",
-            backgroundColor: "#f4f4f4",
-            minHeight: "90vh",
-          }}
-        >
-          <h1>Admin Dashboard</h1>
-    </div>
-    </>
-  )
-}
-
-export default Admin
+    <Layout 
+      signOut={signOut} 
+      user={user}
+      sidebarOpen={sidebarOpen}
+      toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+    >
+      <h1>Admin Dashboard</h1>
+      {/* Your admin page content */}
+    </Layout>
+  );
+};
+export default Admin;

@@ -1,11 +1,33 @@
 .sidebar {
-  width: 240px;
   height: 100vh;
   background-color: #fff;
   border-right: 1px solid #ddd;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
   padding-top: 20px;
   position: fixed;
+  transition: width 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  width: 240px;
+}
+
+.sidebar.closed {
+  width: 60px;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  color: #333;
+  margin-bottom: 20px;
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 .sidebar-title {
@@ -30,6 +52,7 @@
   color: #333;
   font-size: 15px;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
 .sidebar-link .icon {
@@ -37,6 +60,7 @@
   font-size: 16px;
   color: #444;
 }
+
 .sidebar-link.active {
   background-color: #d6eaff;
   color: #2056ae;
@@ -53,4 +77,19 @@
   background-color: #d6eaff;
   color: #2056ae;
   font-weight: 600;
+}
+
+/* For closed state */
+.sidebar.closed .sidebar-link {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.sidebar.closed .sidebar-link span {
+  display: none;
+}
+
+.sidebar.closed .sidebar-link .icon {
+  margin-right: 0;
+  font-size: 20px;
 }

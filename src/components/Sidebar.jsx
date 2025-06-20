@@ -3,10 +3,9 @@ import "./Sidebar.css";
 import { FaUser, FaTools } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen }) => {
   return (
-    <div className="sidebar">
-    
+    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
       <ul className="sidebar-links">
         <li>
           <NavLink
