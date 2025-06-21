@@ -17,7 +17,7 @@ const Layout = ({ children, signOut, user, sidebarOpen, toggleSidebar }) => {
         className="main-content"
         style={{
           marginLeft: sidebarOpen ? "240px" : "60px",
-          padding: "20px",
+          padding: "3px",
           minHeight: "80vh",
           transition: "margin-left 0.3s ease"
         }}
